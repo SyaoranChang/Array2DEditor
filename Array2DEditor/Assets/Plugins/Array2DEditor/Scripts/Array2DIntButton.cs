@@ -7,7 +7,7 @@ namespace Array2DEditor
     public class Array2DIntButton : Array2D<int>
     {
         [SerializeField]
-        CellRowInt[] cells = new CellRowInt[Consts.defaultGridSize];
+        protected CellRowInt[] cells = new CellRowInt[Consts.defaultGridSize];
 
         protected override CellRow<int> GetCellRow(int idx)
         {

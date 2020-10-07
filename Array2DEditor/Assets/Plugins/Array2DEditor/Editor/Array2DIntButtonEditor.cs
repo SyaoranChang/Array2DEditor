@@ -11,27 +11,28 @@ namespace Array2DEditor
         protected override int CellHeight { get { return 16; } }
 
         private Vector2 m_CellWeightSize = new Vector2(60, 16);
-        private Vector2 m_CellSetAllWeightSize = new Vector2(150, 16);
 
         private Rect m_LastRect; // 最後繪製的位置
         private Vector2Int m_GridSize = new Vector2Int(2,5); // 基礎按鈕排列的方式
         private const int m_Margin = 5; // 間距
 
-        private int m_NowSettingWeight = 0; // 紀錄目前要設定的權重
+        private int m_NowSettingValue = 0; // 紀錄目前要設定的權重
 
-        // 基礎權重的清單
-        private List<int> m_WeightList = new List<int>();
+        // 基礎數值的清單
+        private List<int> m_BaseValueList = new List<int>();
+
+        protected virtual string m_NowSettingValueLabel { get { return "Now Setting Value"; } }
+        protected virtual string m_NowSettingValueTip { get { return "目前設定的數值"; } }
+        protected virtual string m_ChooseValueLabel { get { return "Choose Value"; } }
 
         public Array2DIntButtonEditor()
         {
-            //m_CellWeightSize = new Vector2(CellWeightWidth, CellWeightHeight);
-
             // 1~9,0
             for (int i=1;i<=9;++i)
             {
-                m_WeightList.Add(i);
+                m_BaseValueList.Add(i);
             }
-            m_WeightList.Add(0);
+            m_BaseValueList.Add(0);
         }
 
         protected override void SetValue(SerializedProperty cell, int i, int j)
@@ -49,25 +50,22 @@ namespace Array2DEditor
         // 當按下按鈕的Callback
         protected override void OnCellBtnClick(SerializedProperty cell, int i, int j)
         {
-            //int[,] previousCells = (target as Array2DIntButton).GetCells();
-
             cell.intValue = default(int);
 
             if (i < gridSize.vector2IntValue.y && j < gridSize.vector2IntValue.x)
             {
-                //cell.intValue = previousCells[i, j];
-                cell.intValue = m_NowSettingWeight;
+                cell.intValue = m_NowSettingValue;
             }
         }
 
-        // 當按下Weight的權重按鈕的Callback
-        protected void OnWeightBtnClick(int Weight)
+        // 當按下BaseValue的權重按鈕的Callback
+        protected void OnBaseValueBtnClick(int Value)
         {
-            m_NowSettingWeight = Weight;
+            m_NowSettingValue = Value;
         }
 
-        // 當按下Weight的權重按鈕的Callback
-        protected void OnSetAllWeightBtnClick(int Weight)
+        // 當按下設定所有數值的按鈕的Callback
+        protected void OnSetAllValueBtnClick(int Value)
         {
             for (int i = 0; i < gridSize.vector2IntValue.y; i++)
             {
@@ -76,7 +74,7 @@ namespace Array2DEditor
 
                 for (int j = 0; j < gridSize.vector2IntValue.x; j++)
                 {
-                    row.GetArrayElementAtIndex(j).intValue = Weight;
+                    row.GetArrayElementAtIndex(j).intValue = Value;
                 }
             }
         }
@@ -88,8 +86,8 @@ namespace Array2DEditor
                 EditorUtility.DisplayDialog("Sum", "Sum: " + GetSum(), "OK");
             }
 
-            // 開始繪製權重的按鈕
-            GUILayout.Label("Choose Weight");
+            // 開始繪製基礎數值的按鈕
+            GUILayout.Label(m_ChooseValueLabel);
 
             GUILayout.Space(0.0f); // 修正下面馬上用GetLastRect()取得資料會有誤的問題
 
@@ -116,10 +114,10 @@ namespace Array2DEditor
                     if (this is Array2DIntButtonEditor)
                     {
                         GUILayout.BeginArea(cellPosition);
-                        int TempWeight = m_WeightList[i* m_GridSize.y+ j];
+                        int TempWeight = m_BaseValueList[i* m_GridSize.y+ j];
                         if (GUILayout.Button(new GUIContent(TempWeight.ToString())))
                         {
-                            OnWeightBtnClick(TempWeight);
+                            OnBaseValueBtnClick(TempWeight);
                         }
                         GUILayout.EndArea();
                     }
@@ -132,16 +130,16 @@ namespace Array2DEditor
 
             GUILayout.Space(10.0f); // 修正下面馬上用GetLastRect()取得資料會有誤的問題
 
-            m_NowSettingWeight = Mathf.RoundToInt(EditorGUILayout.Slider(new GUIContent("Now Setting Weight", "目前設定的權重"), m_NowSettingWeight, 0, 20));
+            m_NowSettingValue = Mathf.RoundToInt(EditorGUILayout.Slider(new GUIContent(m_NowSettingValueLabel, m_NowSettingValueTip), m_NowSettingValue, 0, 20));
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(new GUIContent("Set All to 0"), GUILayout.MinWidth(40)))
             {
-                OnSetAllWeightBtnClick(0);
+                OnSetAllValueBtnClick(0);
             }
             if (GUILayout.Button(new GUIContent("Set All to 1"), GUILayout.MinWidth(40)))
             {
-                OnSetAllWeightBtnClick(1);
+                OnSetAllValueBtnClick(1);
             }
 
             EditorGUILayout.EndHorizontal();
