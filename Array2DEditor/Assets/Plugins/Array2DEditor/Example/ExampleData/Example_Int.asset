@@ -15,5 +15,5 @@ MonoBehaviour:
   gridSize: {x: 3, y: 3}
   cells:
   - row: ffffffff0200000003000000
-  - row: 04000000fbffffff06000000
-  - row: 0700000008000000f7ffffff
+  - row: 04000000fbffffff06000000ffffffff0200000003000000
+  - row: 0700000008000000f7ffffff04000000fbffffff06000000ffffffff0200000003000000

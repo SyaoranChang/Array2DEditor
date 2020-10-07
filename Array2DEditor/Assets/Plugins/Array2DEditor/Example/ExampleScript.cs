@@ -23,9 +23,9 @@ public class ExampleScript : MonoBehaviour
 
         GameObject piece = new GameObject("Piece");
 
-        for(int i = 0; i < array2DBool.GridSize.x; i++)
+        for (int i = 0; i < array2DBool.GridSize.y; i++)
         {
-            for(int j = 0; j < array2DBool.GridSize.y; j++)
+            for (int j = 0; j < array2DBool.GridSize.x; j++)
             {
                 if (cells[i, j])
                 {

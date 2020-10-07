@@ -38,6 +38,11 @@ namespace Array2DEditor
         protected abstract void SetValue(SerializedProperty cell, int i, int j);
         protected virtual void OnEndInspectorGUI() { }
 
+        protected virtual void OnCellBtnClick(SerializedProperty cell, int i, int j)
+        {
+            int x = 0;
+        }
+
 
         void OnEnable()
         {
@@ -144,7 +149,48 @@ namespace Array2DEditor
 
                 for (int j = 0; j < gridSize.vector2IntValue.x; j++)
                 {
-                    EditorGUI.PropertyField(cellPosition, row.GetArrayElementAtIndex(j), GUIContent.none);
+                    // 改為產生按鈕
+                    if (this is Array2DIntButtonEditor)
+                    {
+                        GUILayout.BeginArea(cellPosition);
+                        Color oldColor = GUI.backgroundColor;
+                        int Num = row.GetArrayElementAtIndex(j).intValue;
+                        if (Num > 0)
+                        {
+                            Color OrangeColor = new Color(1, 0.5f, 0);
+                            Color OrangeRedColor = new Color(1, 0.27f, 0);
+                            if (Num <= 3)
+                            {
+                                int TempNumForColor = Num + 3;
+                                GUI.backgroundColor = Color.Lerp(Color.white, Color.yellow, TempNumForColor / 7f);
+                            }
+                            else if (Num <= 7)
+                            {
+                                int TempNumForColor = Num - 3;
+                                GUI.backgroundColor = Color.Lerp(Color.yellow, OrangeColor, TempNumForColor / 7f);
+                            }
+                            else
+                            {
+                                int TempNumForColor = Num - 7;
+                                GUI.backgroundColor = Color.Lerp(OrangeColor, OrangeRedColor, TempNumForColor / 16f);
+                            }
+                        }
+
+                        var style = new GUIStyle(GUI.skin.button);
+//                         style.normal.textColor = Color.red;
+//                         style.active.textColor = Color.green;
+                        if (GUILayout.Button(new GUIContent(Num.ToString()), style))
+                        //if (GUILayout.Button(new GUIContent("1")))
+                        {
+                            OnCellBtnClick(row.GetArrayElementAtIndex(j), i, j);
+                        }
+                        GUI.backgroundColor = oldColor;
+                        GUILayout.EndArea();
+                    }
+                    else
+                    {
+                        EditorGUI.PropertyField(cellPosition, row.GetArrayElementAtIndex(j), GUIContent.none);
+                    }
                     cellPosition.x += cellSize.x + margin;
                 }
 
