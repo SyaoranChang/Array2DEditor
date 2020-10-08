@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e151c7002e48914a84b70370c2492ab, type: 3}
-  m_Name: Example_IntButton_Test
+  m_Name: Example_IntButton_ColorTest
   m_EditorClassIdentifier: 
   gridSize: {x: 9, y: 11}
   cells:

@@ -8,6 +8,7 @@ using UnityEditor;
 using UnityEngine;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Collections.Generic;
 
 namespace Array2DEditor
 {
@@ -41,6 +42,9 @@ namespace Array2DEditor
 
         protected virtual bool m_IsEnableChangeCellColor { get { return true; } }
 
+        // 特別需求Cell要用的顏色
+        protected Dictionary<int, Dictionary<int, Color>> m_SpecialCellColorData = new Dictionary<int, Dictionary<int, Color>>();
+
         protected abstract void SetValue(SerializedProperty cell, int i, int j);
         protected virtual void OnEndInspectorGUI() { }
 
@@ -49,8 +53,7 @@ namespace Array2DEditor
 
         }
 
-
-        void OnEnable()
+        public virtual void OnEnable()
         {
             gridSize = serializedObject.FindProperty("gridSize");
             cells = serializedObject.FindProperty("cells");
@@ -163,10 +166,11 @@ namespace Array2DEditor
                     if (this is Array2DIntButtonEditor)
                     {
                         GUILayout.BeginArea(cellPosition);
+                        SerializedProperty TempSerializedProperty = row.GetArrayElementAtIndex(j);
                         Color OldBackgroundColor = GUI.backgroundColor;
                         if (m_IsEnableChangeCellColor)
                         {
-                            Color NewBackgroundColor = GetCellNewBackgroundColor(row.GetArrayElementAtIndex(j));
+                            Color NewBackgroundColor = GetCellNewBackgroundColor(TempSerializedProperty, j, i);
                             GUI.backgroundColor = NewBackgroundColor;
                         }
                         // 如果需要改變文字顏色時
@@ -177,7 +181,7 @@ namespace Array2DEditor
                         //if (GUILayout.Button(new GUIContent(Num.ToString()), style))
                         if (GUILayout.Button(new GUIContent(Num.ToString())))
                         {
-                            OnCellBtnClick(row.GetArrayElementAtIndex(j), i, j);
+                            OnCellBtnClick(TempSerializedProperty, i, j);
                         }
                         if (m_IsEnableChangeCellColor)
                         {
@@ -187,13 +191,14 @@ namespace Array2DEditor
                     }
                     else
                     {
+                        SerializedProperty TempSerializedProperty = row.GetArrayElementAtIndex(j);
                         Color OldBackgroundColor = GUI.backgroundColor;
                         if (m_IsEnableChangeCellColor)
                         {
-                            Color NewBackgroundColor = GetCellNewBackgroundColor(row.GetArrayElementAtIndex(j));
+                            Color NewBackgroundColor = GetCellNewBackgroundColor(TempSerializedProperty, j, i);
                             GUI.backgroundColor = NewBackgroundColor;
                         }
-                        EditorGUI.PropertyField(cellPosition, row.GetArrayElementAtIndex(j), GUIContent.none);
+                        EditorGUI.PropertyField(cellPosition, TempSerializedProperty, GUIContent.none);
                         if (m_IsEnableChangeCellColor)
                         {
                             GUI.backgroundColor = OldBackgroundColor;
@@ -219,9 +224,17 @@ namespace Array2DEditor
             GUILayout.Space(cellSize.y + margin); // If we don't do this, the next things we're going to draw after the grid will be drawn on top of the grid
         }
 
-        protected Color GetCellNewBackgroundColor(SerializedProperty serializedProperty)
+        // 取得Cell要用的背景的顏色
+        protected Color GetCellNewBackgroundColor(SerializedProperty serializedProperty, int x, int y)
         {
             Color NewColor = Color.white;
+
+            // 檢查是否有在特別需求Cell要用的顏色資料中
+            if (CheckSpecialCellColorData(x, y))
+            {
+                NewColor = GetSpecialCellColor(x, y);
+                return NewColor;
+            }
 
             if (this is Array2DIntButtonEditor)
             {
@@ -251,6 +264,45 @@ namespace Array2DEditor
             {
                 //NewColor = Color.cyan;
             }
+
+            return NewColor;
+        }
+
+        // 檢查此座標是否有在特別需求Cell要用的顏色資料中
+        protected bool CheckSpecialCellColorData(int x, int y)
+        {
+            Dictionary<int, Color> TempCellColorData = new Dictionary<int, Color>();
+            if (!m_SpecialCellColorData.TryGetValue(x, out TempCellColorData))
+            {
+                return false;
+            }
+
+            if (!TempCellColorData.ContainsKey(y))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // 取得此座標在特別需求Cell要用的顏色
+        protected Color GetSpecialCellColor(int x, int y)
+        {
+            Color NewColor = Color.white;
+
+            Dictionary<int, Color> TempCellColorData = new Dictionary<int, Color>();
+            if(!m_SpecialCellColorData.TryGetValue(x, out TempCellColorData))
+            {
+                return NewColor;
+            }
+
+            Color TempColor = Color.white;
+            if (!TempCellColorData.TryGetValue(y, out TempColor))
+            {
+                return NewColor;
+            }
+
+            NewColor = TempColor;
 
             return NewColor;
         }

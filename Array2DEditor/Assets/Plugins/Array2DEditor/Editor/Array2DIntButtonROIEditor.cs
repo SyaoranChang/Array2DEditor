@@ -1,4 +1,5 @@
 ﻿using Boo.Lang;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
@@ -13,9 +14,31 @@ namespace Array2DEditor
         protected override string m_NowSettingValueTip { get { return "目前設定的權重"; } }
         protected override string m_ChooseValueLabel { get { return "Choose Weight"; } }
 
+        Vector2Int m_CenterPos = Vector2Int.zero;
+
         public Array2DIntButtonROIEditor()
         {
 
+        }
+
+        public override void OnEnable()
+        {
+            base.OnEnable();
+
+            if (null == gridSize)
+            {
+                Debug.LogWarning("gridSize is null !");
+                return;
+            }
+
+            m_CenterPos.x = (gridSize.vector2IntValue.x + 1) / 2 - 1;
+            m_CenterPos.y = (gridSize.vector2IntValue.y + 1) / 2 - 1;
+
+            // 設定ROI中心點的顏色
+            Dictionary<int, Color> TempCellColorData = new Dictionary<int, Color>();
+            Color NewColor = Color.Lerp(Color.white, Color.green, 0.7f);
+            TempCellColorData.Add(m_CenterPos.y, NewColor);
+            m_SpecialCellColorData.Add(m_CenterPos.x, TempCellColorData);
         }
 
         protected override void DisplayGrid(Rect startRect)
@@ -35,11 +58,8 @@ namespace Array2DEditor
         {
             if (null == gridSize) return;
 
-            Vector2Int Center = Vector2Int.zero;
-            Center.x = (gridSize.vector2IntValue.x + 1) /2 -1;
-            Center.y = (gridSize.vector2IntValue.y + 1) / 2 -1;
-            SerializedProperty row = GetRowAt(Center.y);
-            row.GetArrayElementAtIndex(Center.x).intValue = 0;
+            SerializedProperty row = GetRowAt(m_CenterPos.y);
+            row.GetArrayElementAtIndex(m_CenterPos.x).intValue = 0;
         }
     }
 }

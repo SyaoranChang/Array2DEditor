@@ -27,8 +27,6 @@ namespace Array2DEditor
         protected virtual string m_NowSettingValueTip { get { return "目前設定的數值"; } }
         protected virtual string m_ChooseValueLabel { get { return "Choose Value"; } }
 
-
-
         public Array2DIntButtonEditor()
         {
             // 1~9,0
@@ -131,7 +129,7 @@ namespace Array2DEditor
                 GUILayout.Space(m_CellWeightSize.y + m_Margin); // If we don't do this, the next things we're going to draw after the grid will be drawn on top of the grid
             }
 
-            GUILayout.Space(10.0f); // 修正下面馬上用GetLastRect()取得資料會有誤的問題
+            GUILayout.Space(10.0f);
 
             m_NowSettingValue = Mathf.RoundToInt(EditorGUILayout.Slider(new GUIContent(m_NowSettingValueLabel, m_NowSettingValueTip), m_NowSettingValue, m_NowSettingValueMin, m_NowSettingValueMax));
 

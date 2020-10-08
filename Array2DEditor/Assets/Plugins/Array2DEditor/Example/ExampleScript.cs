@@ -21,9 +21,7 @@ public class ExampleScript : MonoBehaviour
 
         bool[,] cells = array2DBool.GetCells();
 
-        var cells2 = array2DBool.GetCells();
-
-        var cells3 = array2DBool.GetCellsList();
+        var cells2 = array2DBool.GetCellsList();
 
         GameObject piece = new GameObject("Piece");
 
@@ -44,7 +42,7 @@ public class ExampleScript : MonoBehaviour
         {
             for (int j = 0; j < array2DBool.GridSize.y; j++)
             {
-                if (cells3[i][j])
+                if (cells2[i][j])
                 {
                     GameObject prefabGO = Instantiate(prefabToInstantiate, new Vector3(i, 0, j), Quaternion.identity, piece.transform);
                     prefabGO.name = "(" + i + ", " + j + ")";
