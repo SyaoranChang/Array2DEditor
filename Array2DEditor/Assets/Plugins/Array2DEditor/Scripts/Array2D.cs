@@ -18,6 +18,9 @@ namespace Array2DEditor
 
         public Vector2Int GridSize { get { return gridSize; } }
 
+        [SerializeField]
+        protected bool isEnableChangeCellColor = true;
+        public bool m_IsEnableChangeCellColor { get { return isEnableChangeCellColor; } }
 
         protected abstract CellRow<T> GetCellRow(int idx);
 

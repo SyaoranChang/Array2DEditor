@@ -61,5 +61,31 @@ namespace Array2DEditor
             SerializedProperty row = GetRowAt(m_CenterPos.y);
             row.GetArrayElementAtIndex(m_CenterPos.x).intValue = 0;
         }
+
+        protected override bool CheckIsWrongSize(Vector2Int newGridSize)
+        {
+            if(base.CheckIsWrongSize(newGridSize))
+            {
+                return true;
+            }
+
+            // ROI 只能是單數
+            if (newGridSize.x % 2 == 0 || newGridSize.y % 2 == 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        protected override string WrongSizeHelpBoxString()
+        {
+            string ErrorString = base.WrongSizeHelpBoxString();
+
+            ErrorString += "\n";
+            ErrorString += "Can only be Odd number";
+
+            return ErrorString;
+        }
     }
 }

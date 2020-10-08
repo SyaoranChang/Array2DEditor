@@ -18,6 +18,7 @@ namespace Array2DEditor
 
         protected SerializedProperty gridSize;
         protected SerializedProperty cells;
+        protected SerializedProperty isEnableChangeCellColor;
 
         private Rect lastRect;
         protected Vector2Int newGridSize;
@@ -40,8 +41,6 @@ namespace Array2DEditor
         protected virtual int m_RowIndexNumWidth { get { return 16; } }
         protected virtual int m_ColumnIndexNumWidth { get { return 16; } }
 
-        protected virtual bool m_IsEnableChangeCellColor { get { return true; } }
-
         // 特別需求Cell要用的顏色
         protected Dictionary<int, Dictionary<int, Color>> m_SpecialCellColorData = new Dictionary<int, Dictionary<int, Color>>();
 
@@ -57,6 +56,7 @@ namespace Array2DEditor
         {
             gridSize = serializedObject.FindProperty("gridSize");
             cells = serializedObject.FindProperty("cells");
+            isEnableChangeCellColor = serializedObject.FindProperty("isEnableChangeCellColor");
 
             newGridSize = gridSize.vector2IntValue;
 
@@ -75,7 +75,7 @@ namespace Array2DEditor
                 newGridSize = EditorGUILayout.Vector2IntField("Grid Size", newGridSize);
                 SetBoldDefaultFont(false);
                 gridSizeChanged = newGridSize != gridSize.vector2IntValue;
-                wrongSize = (newGridSize.x <= 0 || newGridSize.y <= 0);
+                wrongSize = CheckIsWrongSize(newGridSize);
 
                 GUI.enabled = gridSizeChanged && !wrongSize;
 
@@ -104,8 +104,10 @@ namespace Array2DEditor
 
             if (wrongSize)
             {
-                EditorGUILayout.HelpBox("Wrong size.", MessageType.Error);
+                EditorGUILayout.HelpBox(WrongSizeHelpBoxString(), MessageType.Error);
             }
+
+            isEnableChangeCellColor.boolValue = EditorGUILayout.Toggle(new GUIContent("Is Enable Change Cell Color", "是否啟用改變 Cell 顏色"), isEnableChangeCellColor.boolValue);
 
             EditorGUILayout.Space();
 
@@ -119,6 +121,21 @@ namespace Array2DEditor
             OnEndInspectorGUI();
 
             serializedObject.ApplyModifiedProperties(); // Apply changes to all serializedProperties - always do this at the end of OnInspectorGUI.
+        }
+
+        protected virtual bool CheckIsWrongSize(Vector2Int newGridSize)
+        {
+            if(newGridSize.x <= 0 || newGridSize.y <= 0)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        protected virtual string WrongSizeHelpBoxString()
+        {
+            return "Wrong size.";
         }
 
         private void InitNewGrid(Vector2 newSize)
@@ -168,7 +185,7 @@ namespace Array2DEditor
                         GUILayout.BeginArea(cellPosition);
                         SerializedProperty TempSerializedProperty = row.GetArrayElementAtIndex(j);
                         Color OldBackgroundColor = GUI.backgroundColor;
-                        if (m_IsEnableChangeCellColor)
+                        if (isEnableChangeCellColor.boolValue)
                         {
                             Color NewBackgroundColor = GetCellNewBackgroundColor(TempSerializedProperty, j, i);
                             GUI.backgroundColor = NewBackgroundColor;
@@ -183,7 +200,7 @@ namespace Array2DEditor
                         {
                             OnCellBtnClick(TempSerializedProperty, i, j);
                         }
-                        if (m_IsEnableChangeCellColor)
+                        if (isEnableChangeCellColor.boolValue)
                         {
                             GUI.backgroundColor = OldBackgroundColor;
                         }
@@ -193,13 +210,13 @@ namespace Array2DEditor
                     {
                         SerializedProperty TempSerializedProperty = row.GetArrayElementAtIndex(j);
                         Color OldBackgroundColor = GUI.backgroundColor;
-                        if (m_IsEnableChangeCellColor)
+                        if (isEnableChangeCellColor.boolValue)
                         {
                             Color NewBackgroundColor = GetCellNewBackgroundColor(TempSerializedProperty, j, i);
                             GUI.backgroundColor = NewBackgroundColor;
                         }
                         EditorGUI.PropertyField(cellPosition, TempSerializedProperty, GUIContent.none);
-                        if (m_IsEnableChangeCellColor)
+                        if (isEnableChangeCellColor.boolValue)
                         {
                             GUI.backgroundColor = OldBackgroundColor;
                         }
