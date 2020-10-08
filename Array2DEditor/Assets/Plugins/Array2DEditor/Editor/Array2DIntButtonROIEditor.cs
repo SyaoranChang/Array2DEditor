@@ -15,7 +15,7 @@ namespace Array2DEditor
 
         public Array2DIntButtonROIEditor()
         {
-            ProcessForROI();
+
         }
 
         protected override void DisplayGrid(Rect startRect)
@@ -33,6 +33,8 @@ namespace Array2DEditor
         // ROI的特別處理
         protected virtual void ProcessForROI()
         {
+            if (null == gridSize) return;
+
             Vector2Int Center = Vector2Int.zero;
             Center.x = (gridSize.vector2IntValue.x + 1) /2 -1;
             Center.y = (gridSize.vector2IntValue.y + 1) / 2 -1;

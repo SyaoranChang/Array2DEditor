@@ -4,6 +4,7 @@
  * Please share this if you enjoy it! :)
 */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Array2DEditor
@@ -20,7 +21,7 @@ namespace Array2DEditor
 
         protected abstract CellRow<T> GetCellRow(int idx);
 
-
+        // 回傳2維陣列型態資料
         public T[,] GetCells()
         {
             T[,] ret = new T[gridSize.y, gridSize.x];
@@ -34,6 +35,24 @@ namespace Array2DEditor
             }
 
             return ret;
+        }
+
+        // 回傳2維List型態資料
+        public List<List<T>> GetCellsList()
+        {
+            var CellsList = new List<List<T>>();
+
+            for (int i = 0; i < gridSize.x; i++)
+            {
+                List<T> TempList = new List<T>();
+                for (int j = 0; j < gridSize.y; j++)
+                {
+                    TempList.Add(GetCellRow(j)[i]);
+                }
+                CellsList.Add(TempList);
+            }
+
+            return CellsList;
         }
     }
 

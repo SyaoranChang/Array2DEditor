@@ -7,6 +7,7 @@
 using UnityEditor;
 using UnityEngine;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Array2DEditor
 {
@@ -35,12 +36,17 @@ namespace Array2DEditor
         /// </summary>
         protected virtual int CellHeight { get { return 16; } }
 
+        protected virtual int m_RowIndexNumWidth { get { return 16; } }
+        protected virtual int m_ColumnIndexNumWidth { get { return 16; } }
+
+        protected virtual bool m_IsEnableChangeCellColor { get { return true; } }
+
         protected abstract void SetValue(SerializedProperty cell, int i, int j);
         protected virtual void OnEndInspectorGUI() { }
 
         protected virtual void OnCellBtnClick(SerializedProperty cell, int i, int j)
         {
-            int x = 0;
+
         }
 
 
@@ -142,53 +148,56 @@ namespace Array2DEditor
 
             float startLineX = cellPosition.x;
 
-            for (int i = 0; i < gridSize.vector2IntValue.y; i++)
+            //for (int i = 0; i < gridSize.vector2IntValue.y; i++)
+            // Ascending Order 遞增的方式排列
+            for (int i = (gridSize.vector2IntValue.y-1); i >= 0; i--)
             {
                 SerializedProperty row = GetRowAt(i);
                 cellPosition.x = startLineX; // Get back to the beginning of the line
 
+                EditorGUI.LabelField(cellPosition, i.ToString());
+                cellPosition.x += m_RowIndexNumWidth;
                 for (int j = 0; j < gridSize.vector2IntValue.x; j++)
                 {
                     // 改為產生按鈕
                     if (this is Array2DIntButtonEditor)
                     {
                         GUILayout.BeginArea(cellPosition);
-                        Color oldColor = GUI.backgroundColor;
-                        int Num = row.GetArrayElementAtIndex(j).intValue;
-                        if (Num > 0)
+                        Color OldBackgroundColor = GUI.backgroundColor;
+                        if (m_IsEnableChangeCellColor)
                         {
-                            Color OrangeColor = new Color(1, 0.5f, 0);
-                            Color OrangeRedColor = new Color(1, 0.27f, 0);
-                            if (Num <= 3)
-                            {
-                                int TempNumForColor = Num + 3;
-                                GUI.backgroundColor = Color.Lerp(Color.white, Color.yellow, TempNumForColor / 7f);
-                            }
-                            else if (Num <= 7)
-                            {
-                                int TempNumForColor = Num - 3;
-                                GUI.backgroundColor = Color.Lerp(Color.yellow, OrangeColor, TempNumForColor / 7f);
-                            }
-                            else
-                            {
-                                int TempNumForColor = Num - 7;
-                                GUI.backgroundColor = Color.Lerp(OrangeColor, OrangeRedColor, TempNumForColor / 16f);
-                            }
+                            Color NewBackgroundColor = GetCellNewBackgroundColor(row.GetArrayElementAtIndex(j));
+                            GUI.backgroundColor = NewBackgroundColor;
                         }
-
-                        var style = new GUIStyle(GUI.skin.button);
-//                         style.normal.textColor = Color.red;
-//                         style.active.textColor = Color.green;
-                        if (GUILayout.Button(new GUIContent(Num.ToString()), style))
+                        // 如果需要改變文字顏色時
+                        //var style = new GUIStyle(GUI.skin.button);
+                        //style.normal.textColor = Color.red;
+                        //style.active.textColor = Color.green;
+                        int Num = row.GetArrayElementAtIndex(j).intValue;
+                        //if (GUILayout.Button(new GUIContent(Num.ToString()), style))
+                        if (GUILayout.Button(new GUIContent(Num.ToString())))
                         {
                             OnCellBtnClick(row.GetArrayElementAtIndex(j), i, j);
                         }
-                        GUI.backgroundColor = oldColor;
+                        if (m_IsEnableChangeCellColor)
+                        {
+                            GUI.backgroundColor = OldBackgroundColor;
+                        }
                         GUILayout.EndArea();
                     }
                     else
                     {
+                        Color OldBackgroundColor = GUI.backgroundColor;
+                        if (m_IsEnableChangeCellColor)
+                        {
+                            Color NewBackgroundColor = GetCellNewBackgroundColor(row.GetArrayElementAtIndex(j));
+                            GUI.backgroundColor = NewBackgroundColor;
+                        }
                         EditorGUI.PropertyField(cellPosition, row.GetArrayElementAtIndex(j), GUIContent.none);
+                        if (m_IsEnableChangeCellColor)
+                        {
+                            GUI.backgroundColor = OldBackgroundColor;
+                        }
                     }
                     cellPosition.x += cellSize.x + margin;
                 }
@@ -196,6 +205,54 @@ namespace Array2DEditor
                 cellPosition.y += cellSize.y + margin;
                 GUILayout.Space(cellSize.y + margin); // If we don't do this, the next things we're going to draw after the grid will be drawn on top of the grid
             }
+
+            cellPosition.x = startLineX; // Get back to the beginning of the line
+            cellPosition.x += m_ColumnIndexNumWidth;
+
+            var centeredStyle = GUI.skin.GetStyle("Label");
+            centeredStyle.alignment = TextAnchor.MiddleCenter;
+            for (int i = 0; i < gridSize.vector2IntValue.x; i++)
+            {
+                EditorGUI.LabelField(cellPosition, (i).ToString(), centeredStyle);
+                cellPosition.x += cellSize.x + margin;
+            }
+            GUILayout.Space(cellSize.y + margin); // If we don't do this, the next things we're going to draw after the grid will be drawn on top of the grid
+        }
+
+        protected Color GetCellNewBackgroundColor(SerializedProperty serializedProperty)
+        {
+            Color NewColor = Color.white;
+
+            if (this is Array2DIntButtonEditor)
+            {
+                int Num = serializedProperty.intValue;
+                if (Num > 0)
+                {
+                    Color OrangeColor = new Color(1, 0.5f, 0);
+                    Color OrangeRedColor = new Color(1, 0.27f, 0);
+                    if (Num <= 3)
+                    {
+                        int TempNumForColor = Num + 3;
+                        NewColor = Color.Lerp(Color.white, Color.yellow, TempNumForColor / 7f);
+                    }
+                    else if (Num <= 7)
+                    {
+                        int TempNumForColor = Num - 3;
+                        NewColor = Color.Lerp(Color.yellow, OrangeColor, TempNumForColor / 7f);
+                    }
+                    else
+                    {
+                        int TempNumForColor = Num - 7;
+                        NewColor = Color.Lerp(OrangeColor, OrangeRedColor, TempNumForColor / 16f);
+                    }
+                }
+            }
+            else
+            {
+                //NewColor = Color.cyan;
+            }
+
+            return NewColor;
         }
 
         protected SerializedProperty GetRowAt(int idx)

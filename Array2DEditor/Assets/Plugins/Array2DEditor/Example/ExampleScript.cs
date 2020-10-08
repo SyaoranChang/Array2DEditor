@@ -21,8 +21,13 @@ public class ExampleScript : MonoBehaviour
 
         bool[,] cells = array2DBool.GetCells();
 
+        var cells2 = array2DBool.GetCells();
+
+        var cells3 = array2DBool.GetCellsList();
+
         GameObject piece = new GameObject("Piece");
 
+        /*
         for (int i = 0; i < array2DBool.GridSize.y; i++)
         {
             for (int j = 0; j < array2DBool.GridSize.x; j++)
@@ -33,6 +38,18 @@ public class ExampleScript : MonoBehaviour
                     prefabGO.name = "(" + i + ", " + j + ")";
                 }
             }
+        }*/
+
+        for (int i = 0; i < array2DBool.GridSize.x; i++)
+        {
+            for (int j = 0; j < array2DBool.GridSize.y; j++)
+            {
+                if (cells3[i][j])
+                {
+                    GameObject prefabGO = Instantiate(prefabToInstantiate, new Vector3(i, 0, j), Quaternion.identity, piece.transform);
+                    prefabGO.name = "(" + i + ", " + j + ")";
+                }
+            }
         }
-	}
+    }
 }
