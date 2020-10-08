@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Example_String
   m_EditorClassIdentifier: 
   gridSize: {x: 3, y: 2}
+  isEnableChangeCellColor: 1
   cells:
   - row:
     - test

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Example_Enum
   m_EditorClassIdentifier: 
   gridSize: {x: 3, y: 3}
+  isEnableChangeCellColor: 1
   cells:
   - row: 000000000100000000000000
   - row: 010000000200000001000000010000000000000000000000

@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Example_Float
   m_EditorClassIdentifier: 
   gridSize: {x: 3, y: 3}
+  isEnableChangeCellColor: 1
   cells:
   - row:
     - 3.2
