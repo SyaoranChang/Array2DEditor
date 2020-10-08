@@ -132,7 +132,7 @@ namespace Array2DEditor
             gridSize.vector2IntValue = newGridSize;
         }
 
-        private void DisplayGrid(Rect startRect)
+        protected virtual void DisplayGrid(Rect startRect)
         {
             Rect cellPosition = startRect;
 
@@ -180,7 +180,6 @@ namespace Array2DEditor
 //                         style.normal.textColor = Color.red;
 //                         style.active.textColor = Color.green;
                         if (GUILayout.Button(new GUIContent(Num.ToString()), style))
-                        //if (GUILayout.Button(new GUIContent("1")))
                         {
                             OnCellBtnClick(row.GetArrayElementAtIndex(j), i, j);
                         }

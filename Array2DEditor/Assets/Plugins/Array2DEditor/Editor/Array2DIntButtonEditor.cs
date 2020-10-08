@@ -21,9 +21,13 @@ namespace Array2DEditor
         // 基礎數值的清單
         private List<int> m_BaseValueList = new List<int>();
 
+        protected virtual int m_NowSettingValueMin { get { return 0; } }
+        protected virtual int m_NowSettingValueMax { get { return 99; } }
         protected virtual string m_NowSettingValueLabel { get { return "Now Setting Value"; } }
         protected virtual string m_NowSettingValueTip { get { return "目前設定的數值"; } }
         protected virtual string m_ChooseValueLabel { get { return "Choose Value"; } }
+
+
 
         public Array2DIntButtonEditor()
         {
@@ -69,7 +73,6 @@ namespace Array2DEditor
         {
             for (int i = 0; i < gridSize.vector2IntValue.y; i++)
             {
-                cells.InsertArrayElementAtIndex(i);
                 SerializedProperty row = GetRowAt(i);
 
                 for (int j = 0; j < gridSize.vector2IntValue.x; j++)
@@ -130,7 +133,7 @@ namespace Array2DEditor
 
             GUILayout.Space(10.0f); // 修正下面馬上用GetLastRect()取得資料會有誤的問題
 
-            m_NowSettingValue = Mathf.RoundToInt(EditorGUILayout.Slider(new GUIContent(m_NowSettingValueLabel, m_NowSettingValueTip), m_NowSettingValue, 0, 20));
+            m_NowSettingValue = Mathf.RoundToInt(EditorGUILayout.Slider(new GUIContent(m_NowSettingValueLabel, m_NowSettingValueTip), m_NowSettingValue, m_NowSettingValueMin, m_NowSettingValueMax));
 
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button(new GUIContent("Set All to 0"), GUILayout.MinWidth(40)))
